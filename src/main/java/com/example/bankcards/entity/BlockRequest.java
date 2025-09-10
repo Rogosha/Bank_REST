@@ -15,7 +15,7 @@ public class BlockRequest {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id")
+    @JoinColumn(name = "admin_id ")
     private User admin;
 
     @Column
