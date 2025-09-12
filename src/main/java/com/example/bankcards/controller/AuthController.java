@@ -1,41 +1,46 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.AuthRequest;
-import com.example.bankcards.security.JwtService;
+import com.example.bankcards.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UserDetailsService userDetailsService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
+    @Autowired
+    AuthService authService;
+
+    /**
+     * Регистрация нового пользователя
+     * @param authRequest Тело запроса, содержащее email, password, role
+     * @return HTTP код и текстовое сообщение
+     */
+    @Operation(summary = "Registration", description = "Allows to register by email, password and role")
+    @PostMapping("/signup")
+    ResponseEntity<?> signUp(@Parameter(description = "Sign up request with email, password and role parameters") @RequestBody AuthRequest authRequest){
+        return authService.register(authRequest);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-
-        UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
-        String jwt = jwtService.generateToken(user.getUsername());
-
-        return ResponseEntity.ok(Map.of("token", jwt));
+    /**
+     * Регистрация нового пользователя
+     * @param authRequest Тело запроса, содержащее email, password
+     * @return HTTP код и текстовое сообщение
+     */
+    @Operation(summary = "Authentication", description = "Allows to authenticate by email and password. Return JWT-token")
+    @PostMapping("/signin")
+    ResponseEntity<?> signIn(@Parameter(description = "Sign up request with email and password parameters") @RequestBody AuthRequest authRequest){
+        return authService.login(authRequest);
     }
+
+
 }

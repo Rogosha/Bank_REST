@@ -1,6 +1,13 @@
 package com.example.bankcards.util;
 
-public enum UserRole {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum UserRole implements GrantedAuthority {
     client,
-    admin
+    admin;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }
